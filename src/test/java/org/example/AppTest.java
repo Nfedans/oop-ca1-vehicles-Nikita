@@ -10,6 +10,7 @@ import org.junit.Test;
  */
 public class AppTest 
 {
+    //
     // Test construction of Van object.
     @Test
     public void createVan()

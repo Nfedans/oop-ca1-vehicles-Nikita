@@ -1,5 +1,5 @@
 package org.example;
-
+//
 // Van class to represent Vans and Trucks
 //
 public class Van extends Vehicle

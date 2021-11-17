@@ -2,7 +2,7 @@ package org.example;
 
 // Class that wraps the latitude and longitude of a location
 // into one object for convenience.
-
+//
 public class LocationGPS
 {
     private double latitude;
