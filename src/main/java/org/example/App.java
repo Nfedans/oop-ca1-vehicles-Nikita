@@ -29,9 +29,30 @@ public class App
         System.out.println("List of all passengers:");
         passengerStore.displayAllPassengers();
 
+        boolean valPassenger = passengerStore.addPassenger("John Smith", "john.smith@gmail.com", "4569374",6.7, 5.8);
+            if(valPassenger)
+            {
+                System.out.println("duplicate found");
+            }
+            else
+            {
+                System.out.println("New passenger added to arraylist");
+            }
+
         VehicleManager vehicleManager = new VehicleManager("vehicles.txt");
         System.out.println("List of all Vehicles:");
         vehicleManager.displayAllVehicles();
+
+        Vehicle vehicle = vehicleManager.findVehicleByReg("151D95g105");
+        if(vehicle != null)
+        {
+            System.out.println("Vehicle was found in arraylist");
+        }
+        else
+        {
+            System.out.println("No Vehicle found in arraylist");
+        }
+
 
         System.out.println("Program exiting... Goodbye");
     }

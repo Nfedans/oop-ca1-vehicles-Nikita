@@ -57,4 +57,22 @@ public class PassengerStore {
 
     // TODO - see functional spec for details of code to add
 
+    public boolean addPassenger(String name, String email, String phone, double latitude, double longitude)
+    {
+        Passenger passenger = new Passenger(name, email, phone, latitude, longitude);
+        boolean found = false;
+        // loop through here and check that email and password of passengers dont match
+        for(Passenger p: passengerList)
+        {
+            if(p.equals(passenger))
+            {
+                found = true;
+                return found;
+            }
+        }
+        passengerList.add(passenger);
+        return found;
+
+    }
+
 } // end class

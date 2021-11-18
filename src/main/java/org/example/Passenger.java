@@ -93,4 +93,17 @@ public class Passenger {
                 + email + ", phone=" + phone + ", location="
                 + location + "}";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Passenger)) return false;
+        Passenger passenger = (Passenger) o;
+        return getName().equals(passenger.getName()) && getEmail().equals(passenger.getEmail());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getEmail());
+    }
 }
