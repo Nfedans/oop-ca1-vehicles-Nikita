@@ -39,6 +39,12 @@ public class App
                 System.out.println("New passenger added to arraylist");
             }
 
+        passengerStore.editPassenger("John Smith", "john.smith@gmail.com", "085 555 5555",8.1, 4.6);
+        passengerStore.displayAllPassengers();
+
+        passengerStore.deletePassenger("John Smith", "john.smith@gmail.com", "085 555 5555",8.1, 4.6);
+        passengerStore.displayAllPassengers();
+
         VehicleManager vehicleManager = new VehicleManager("vehicles.txt");
         System.out.println("List of all Vehicles:");
         vehicleManager.displayAllVehicles();
@@ -52,6 +58,29 @@ public class App
         {
             System.out.println("No Vehicle found in arraylist");
         }
+
+        BookingManager bookingManager = new BookingManager();
+        boolean valBooking = bookingManager.addBooking(500, 104, 107,  5.8, 9.7, 6.6, 5,9.3, 2020, 11, 23, 14, 55, 23);
+        if(valBooking)
+        {
+            System.out.println("duplicate found of Booking");
+        }
+        else
+        {
+            System.out.println("New booking added");
+        }
+
+
+        Booking bookingValidator = bookingManager.findBookingById(500);
+        if (bookingValidator != null)
+        {
+            System.out.println("Booking found ");
+        }
+        else
+        {
+            System.out.println("No booking found ");
+        }
+
 
 
         System.out.println("Program exiting... Goodbye");

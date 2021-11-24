@@ -75,4 +75,36 @@ public class PassengerStore {
 
     }
 
+    //
+    // Delete, edit, print methods
+
+    public void editPassenger(String name, String email, String phone, double latitude, double longitude)
+    {
+        Passenger passenger = new Passenger(name, email, phone, latitude, longitude);
+        boolean found = false;
+        for (Passenger p: passengerList)
+        {
+            if(p.equals(passenger))
+            {
+                p.setName(name);
+                p.setEmail(email);
+                p.setPhone(phone);
+                p.setLocation(latitude, longitude);
+                break;
+            }
+        }
+    }
+
+    public void deletePassenger(String name, String email, String phone, double latitude, double longitude )
+    {
+        Passenger passenger = new Passenger(name, email, phone, latitude, longitude);
+        for (Passenger p : this.passengerList) {
+            if(p.equals(passenger))
+            {
+                passengerList.remove(p);
+                break;
+            }
+        }
+    }
+
 } // end class
