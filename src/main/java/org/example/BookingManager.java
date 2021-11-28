@@ -54,4 +54,13 @@ public class BookingManager
         return null;
     }
 
+
+    public void displayAllBookings()
+    {
+        System.out.println("These are the current bookings\n");
+        for(Booking b: bookingList) {
+            System.out.println(b.toString());
+        }
+    }
+
 }

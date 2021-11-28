@@ -58,6 +58,8 @@ public class Passenger {
         return name;
     }
 
+
+
     public LocationGPS getLocation() {
         return location;
     }

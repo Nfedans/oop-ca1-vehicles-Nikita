@@ -32,4 +32,17 @@ class Booking
     public int getBookingId() {
         return bookingId;
     }
+
+    @Override
+    public String toString() {
+        return "Booking{" +
+                "bookingId=" + bookingId +
+                ", passengerId=" + passengerId +
+                ", vehicleId=" + vehicleId +
+                ", bookingDateTime=" + bookingDateTime +
+                ", startLocation=" + startLocation +
+                ", endLocation=" + endLocation +
+                ", cost=" + cost +
+                '}';
+    }
 }

@@ -18,7 +18,7 @@ package org.example;
  *
  */
 
-public class App
+public class App_old_version
 {
     public static void main(String[] args)
     {
@@ -29,7 +29,7 @@ public class App
         System.out.println("List of all passengers:");
         passengerStore.displayAllPassengers();
 
-        boolean valPassenger = passengerStore.addPassenger("John Smith", "john.smith@gmail.com", "4569374",6.7, 5.8);
+       /* boolean valPassenger = passengerStore.addPassenger("John Smith", "john.smith@gmail.com", "4569374",6.7, 5.8);
             if(valPassenger)
             {
                 System.out.println("duplicate found");
@@ -37,19 +37,19 @@ public class App
             else
             {
                 System.out.println("New passenger added to arraylist");
-            }
+            }*/
 
         passengerStore.editPassenger("John Smith", "john.smith@gmail.com", "085 555 5555",8.1, 4.6);
         passengerStore.displayAllPassengers();
 
-        passengerStore.deletePassenger("John Smith", "john.smith@gmail.com", "085 555 5555",8.1, 4.6);
+        passengerStore.deletePassengerByNameAndEmail("Jackson", "jacksonboy@gmail.com");
         passengerStore.displayAllPassengers();
 
         VehicleManager vehicleManager = new VehicleManager("vehicles.txt");
         System.out.println("List of all Vehicles:");
         vehicleManager.displayAllVehicles();
 
-        Vehicle vehicle = vehicleManager.findVehicleByReg("151D95g105");
+        Vehicle vehicle = vehicleManager.findSingleVehicleByReg("151D95g105");
         if(vehicle != null)
         {
             System.out.println("Vehicle was found in arraylist");

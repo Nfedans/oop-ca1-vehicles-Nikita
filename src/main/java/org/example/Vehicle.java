@@ -130,6 +130,31 @@ public abstract class Vehicle
         this.type = type;
     }
 
+
+    public boolean equals( Object otherObject ) {
+
+        if (otherObject == null) { return false; }
+
+        if (getClass() != otherObject.getClass()) { return false; }
+
+        Vehicle other = (Vehicle) otherObject;
+
+        // may run into ordering issue later on
+
+        return make.equals(other.getMake()) &&
+                model.equals(other.getModel()) &&
+                milesPerKwH == other.getMilesPerKm() &&
+                registration.equals(other.getRegistration()) &&
+                costPerMile == other.getCostPerMile() &&
+                lastServicedDate.equals(other.getLastServicedDate()) &&
+                mileage == other.getMileage() &&
+                depotGPSLocation.equals(other.getDepotGPSLocation()) &&
+                type.equals(other.getType());
+
+
+    }
+
+
     @Override
     public String toString()
     {
@@ -140,6 +165,4 @@ public abstract class Vehicle
                 + depotGPSLocation + '}';
     }
 
-
-     
 }

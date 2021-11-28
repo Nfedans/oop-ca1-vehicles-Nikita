@@ -3,6 +3,8 @@ package org.example;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 
 public class VehicleManager {
@@ -14,9 +16,46 @@ public class VehicleManager {
     }
 
     public void displayAllVehicles() {
-        for (Vehicle v : vehicleList)
+        for (Vehicle v : vehicleList) {
             System.out.println(v.toString());
+        }
     }
+
+    public ArrayList<Vehicle> getVehicleList() {
+        return vehicleList;
+    }
+
+    public ArrayList<Vehicle> findVehicleByType(String input){
+        ArrayList<Vehicle> filteredVehicles = this.getVehicleList();
+        Iterator<Vehicle> iterator = filteredVehicles.iterator();
+
+        if(input.equals("Car"))
+        {
+        while(iterator.hasNext()) {
+            Vehicle v = iterator.next();
+
+            if(!(v instanceof Car))
+            {
+                iterator.remove();
+            }
+        }
+        return filteredVehicles;
+        }
+        else
+        {
+            while(iterator.hasNext()) {
+                Vehicle v = iterator.next();
+
+                if(!(v instanceof Van))
+                {
+                    iterator.remove();
+                }
+            }
+            return filteredVehicles;
+        }
+    }
+
+
 
     public void loadVehiclesFromFile(String fileName) {
         try {
@@ -60,7 +99,7 @@ public class VehicleManager {
 
     //TODO add more functionality as per spec.
 
-    public Vehicle findVehicleByReg(String reg)
+    public Vehicle findSingleVehicleByReg(String reg)
     {
         for(Vehicle v: vehicleList) {
             if (v.getRegistration().equalsIgnoreCase(reg)) {
@@ -69,5 +108,32 @@ public class VehicleManager {
         }
                 return null;
     }
+
+   /* public void addVehiclesToList(List<Vehicle> vehiclesList, String type) {
+        for (Vehicle v : this.vehicleList) {
+            vehiclesList.add( new Van(v.getId(), v.getType(), v.getMake(), v.getModel(),
+                    v.getMilesPerKm(), v.getRegistration(), v.getCostPerMile(), v.getLastServicedDate(),
+                    ));
+        }
+    }*/
+
+    // Add to menu, write methods, make comparators
+/*
+    public void Vehicle findVehicleByRegistration()
+    {
+
+    }
+
+    public void Vehicle findVehicleByType()
+    {
+
+    }
+
+    // this one should return an arraylist of all vehicles
+    public void Vehicle findAllVehicles()
+    {
+
+    }
+*/
 
 }
