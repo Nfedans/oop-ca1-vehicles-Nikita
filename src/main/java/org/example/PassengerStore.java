@@ -83,8 +83,10 @@ public class PassengerStore {
         String name = "";
         String email = "";
         String phone = "";
-        Double latitude = -91.0;
-        Double longitude = -181.0;
+        Double startLatitude = -91.0;
+        Double startLongitude = -181.0;
+        Double endLatitude = -91.0;
+        Double endLongitude = -181.0;
 
         while (name.equals("")) {
             System.out.println("Enter passenger name: ");
@@ -118,18 +120,28 @@ public class PassengerStore {
 
         }
 
-        while (latitude < -90 || latitude > 90) {
-            System.out.println("Enter passenger latitude: ");
-            latitude = sc.nextDouble();
+        while (startLatitude < -90 || startLatitude > 90) {
+            System.out.println("Enter passenger start latitude: ");
+            startLatitude = sc.nextDouble();
         }
 
-        while (longitude < -180 || longitude > 180) {
+        while (startLongitude < -180 || startLongitude > 180) {
             System.out.println("Enter passenger longitude: ");
-            longitude = sc.nextDouble();
+            startLongitude = sc.nextDouble();
         }
+
+       /* while (endLatitude < -90 || endLatitude > 90) {
+            System.out.println("Enter passenger start latitude: ");
+            endLatitude = sc.nextDouble();
+        }
+
+        while (endLongitude < -180 || endLongitude > 180) {
+            System.out.println("Enter passenger longitude: ");
+            endLongitude = sc.nextDouble();
+        }*/
 
         int id = 0;
-        Passenger passenger = new Passenger(name, email, phone, latitude, longitude);
+        Passenger passenger = new Passenger(name, email, phone, startLatitude,  startLongitude);
         for(Passenger p: passengerList) {
             if (p.getId() > id ) {
                id = p.getId();
@@ -137,7 +149,7 @@ public class PassengerStore {
         }
         id++;
 
-        passengerList.add(new Passenger(id ,name, email, phone, latitude, longitude));
+        passengerList.add(new Passenger(id ,name, email, phone, startLatitude, startLongitude));
     }
 
 

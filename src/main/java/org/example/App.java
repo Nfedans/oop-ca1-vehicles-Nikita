@@ -27,10 +27,11 @@ public class App {
     VehicleManager vehicleManager;  // encapsulates access to list of Vehicles
     BookingManager bookingManager;  // deals with all bookings
     Booking booking;
+    Vehicle vehicle;
     ArrayList<Vehicle> vehicles;
 
     public static void main(String[] args) {
-        App_starter app = new App_starter();
+        App app = new App();
         app.start();
     }
 
@@ -47,6 +48,10 @@ public class App {
         bookingManager = new BookingManager();
 
         vehicles = vehicleManager.getVehicleList();
+
+
+
+
 
 
         try {
@@ -276,13 +281,21 @@ public class App {
                 + "1. Show all Bookings\n"
                 + "2. Add a Booking\n"
                 + "3. Find Booking \n"
-                + "4. Exit \n"
+                + "4. Show bookings by Passenger ID \n"
+                + "5. Show bookings by Booking ID \n"
+                + "6. Show bookings by Passenger Name \n"
+                + "7. Delete Booking by ID \n"
+                + "8. Exit \n"
                 + "Enter Option [1,4]";
 
         final int SHOW_ALL = 1;
         final int ADD_A_BOOKING = 2;
         final int FIND_BOOKING = 3;
-        final int EXIT = 4;
+        final int SHOW_BY_PID = 4;
+        final int SHOW_BY_BID = 5;
+        final int SHOW_BY_NAME = 6;
+        final int DEL_BY_ID = 7;
+        final int EXIT = 8;
 
         Scanner keyboard = new Scanner(System.in);
         int option = 0;
@@ -293,23 +306,107 @@ public class App {
                 option = Integer.parseInt(usersInput);
                 switch (option) {
                     case SHOW_ALL:
-                        System.out.println("Display ALL Bookings");
-                        bookingManager.displayAllBookings();
+
+                        //System.out.println("Display ALL Bookings");
+                        //bookingManager.displayAllBookings();
+                        bookingManager.DisplayBookings();
                         break;
                     case ADD_A_BOOKING:
+
                         System.out.println("Add a booking");
-                        bookingManager.addBooking(104, 101, 107, 1.1, 2.2,
-                                3.3, 4.4, 500, 2021, 11,
-                                23, 13, 43, 32);
+
+                        System.out.println("Please enter your name");
+                        String nameForBooking = keyboard.nextLine();
+
+                        Passenger checkPass = passengerStore.findPassengerByName(nameForBooking);
+                        if(checkPass == null){
+                            System.out.println("We did not find you in our records, please create a profile!");
+                            passengerStore.addPassenger();
+                            checkPass = passengerStore.findPassengerByName(nameForBooking);
+
+                        }
+                        else{
+                            System.out.println("you're already in our system, excellent!");
+                        }
+
+
+                            Vehicle checkVeh = null;
+                            String vehId = "";
+
+
+                        if (checkVeh == null) {
+                            while(checkVeh == null) {
+                                System.out.println("Please enter the registration of the vehicle you'd like to rent.");
+                                String regForBooking = keyboard.nextLine();
+                                checkVeh = vehicleManager.findSingleVehicleByReg(regForBooking);
+                            }
+
+                        } /*else {
+                            System.out.println("you're already in our system, excellent!");
+                            vehId = vehicle.getId(checkVeh);
+                            // write method to return vehicle id here
+                        }*/
+
+                        int bookingId = bookingManager.assignBookingId();
+
+                        double endLat = 0.0;
+                        double endLong = 0.0;
+
+
+                        while(endLat == 0.0)
+                        {
+                            System.out.println("Please enter the end latitude.");
+                            endLat = keyboard.nextDouble();
+                        }
+                        while(endLong == 0.0)
+                        {
+                            System.out.println("Please enter the end longitude.");
+                            endLong = keyboard.nextDouble();
+                        }
+
+
+                        LocationGPS endLocation = new LocationGPS(endLat, endLong);
+
+                       boolean bk = bookingManager.addBooking(bookingId, checkVeh, checkPass, endLocation);
+
+                       if (bk == false)
+                       {
+                           System.out.println("\n Your Booking Has Been Added Successfully");
+                       }
+                       else
+                       {
+                           System.out.println("\n We have found a duplicate booking!");
+                       }
                         break;
                     case FIND_BOOKING:
                         System.out.println("Find a booking, please enter ID number");
                         int BookId = keyboard.nextInt();
+                        keyboard.nextLine();
                         Booking b = bookingManager.findBookingById(BookId);
                         if (b == null)
                             System.out.println("No booking matching the ID");
                         else
                             System.out.println("Found booking: \n" + b.toString());
+                        break;
+                    case SHOW_BY_PID:
+                        System.out.println("Please enter Passenger ID to view all related bookings");
+                        String passengerID = keyboard.nextLine();
+                        bookingManager.DisplayBookingsByPassengerId(passengerID);
+                        break;
+                    case SHOW_BY_BID:
+                        System.out.println("Please enter Booking ID to view all related bookings");
+                        String bookingID = keyboard.nextLine();
+                        bookingManager.DisplayBookingsByBookingId(bookingID);
+                        break;
+                    case SHOW_BY_NAME:
+                        System.out.println("Please enter Name to view all related bookings");
+                        String name = keyboard.nextLine();
+                        bookingManager.DisplayBookingsByName(name);
+                        break;
+                    case DEL_BY_ID:
+                        System.out.println("Please enter ID of booking you'd like to delete");
+                        String id = keyboard.nextLine();
+                        bookingManager.DeleteBookingById(id);
                         break;
                     case EXIT:
                         System.out.println("Exit Menu option chosen");

@@ -1,6 +1,8 @@
 package org.example;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
+
 //
 class Booking
 {
@@ -28,9 +30,32 @@ class Booking
 
     }
 
+    public int getPassengerId() {
+        return passengerId;
+    }
+
+    public LocalDateTime getBookingDateTime() {
+        return bookingDateTime;
+    }
+
+    public int getVehicleId() {
+        return vehicleId;
+    }
 
     public int getBookingId() {
         return bookingId;
+    }
+
+    public LocationGPS getStartLocation() {
+        return startLocation;
+    }
+
+    public LocationGPS getEndLocation() {
+        return endLocation;
+    }
+
+    public double getCost() {
+        return cost;
     }
 
     @Override
@@ -45,4 +70,5 @@ class Booking
                 ", cost=" + cost +
                 '}';
     }
+
 }
