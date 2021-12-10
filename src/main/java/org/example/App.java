@@ -42,10 +42,11 @@ public class App {
         // create PassengerStore and load all passenger records from text file
         passengerStore = new PassengerStore("passengers.txt");
 
-        // create VehicleManager, and load all vehicles from text file
+        // create VehicleManager, and load all vehicles from text file3
+
         vehicleManager = new VehicleManager("vehicles.txt");
 
-        bookingManager = new BookingManager();
+        bookingManager = new BookingManager(passengerStore, vehicleManager);
 
         vehicles = vehicleManager.getVehicleList();
 
@@ -285,8 +286,9 @@ public class App {
                 + "5. Show bookings by Booking ID \n"
                 + "6. Show bookings by Passenger Name \n"
                 + "7. Delete Booking by ID \n"
-                + "8. Exit \n"
-                + "Enter Option [1,4]";
+                + "8. Edit Booking by ID \n"
+                + "9. Exit \n"
+                + "Enter Option [1,9]";
 
         final int SHOW_ALL = 1;
         final int ADD_A_BOOKING = 2;
@@ -295,7 +297,8 @@ public class App {
         final int SHOW_BY_BID = 5;
         final int SHOW_BY_NAME = 6;
         final int DEL_BY_ID = 7;
-        final int EXIT = 8;
+        final int EDIT_BOOKING = 8;
+        final int EXIT = 9;
 
         Scanner keyboard = new Scanner(System.in);
         int option = 0;
@@ -380,7 +383,7 @@ public class App {
                         break;
                     case FIND_BOOKING:
                         System.out.println("Find a booking, please enter ID number");
-                        int BookId = keyboard.nextInt();
+                        String BookId = keyboard.nextLine();
                         keyboard.nextLine();
                         Booking b = bookingManager.findBookingById(BookId);
                         if (b == null)
@@ -389,9 +392,37 @@ public class App {
                             System.out.println("Found booking: \n" + b.toString());
                         break;
                     case SHOW_BY_PID:
-                        System.out.println("Please enter Passenger ID to view all related bookings");
+                        //System.out.println("Please enter Passenger ID to view all related bookings");
+                        //String passengerID = keyboard.nextLine();
+                        //bookingManager.DisplayBookingsByPassengerId(passengerID);
+
+                        ArrayList<Booking> listByPassID = new ArrayList<>();
+                        System.out.println("List of bookings by passenger ID");
+                        System.out.println("=============================");
+                        System.out.print("Enter passenger id: ");
                         String passengerID = keyboard.nextLine();
-                        bookingManager.DisplayBookingsByPassengerId(passengerID);
+                        if(passengerStore.findPassengerById(passengerID) == null)
+                        {
+                            System.out.println("Passenger doesnt exist");
+                        }
+                        else {
+                            bookingManager.DisplayBookingsByPassengerId(passengerID, listByPassID);
+                            System.out.println();
+                            System.out.println("List of bookings by passenger " + passengerID + " sorted by date");
+                            System.out.println("====================================");
+                            for (Booking bkng : listByPassID) {
+                                System.out.println("--------------------------------------------------------------------------------------------------------------");
+                                System.out.println("\t\tBooking ID : \t\t\t\t\t" + bkng.getBookingId());
+                                System.out.println("\t\tPassenger ID : \t\t\t\t\t" + bkng.getPassengerId());
+                                System.out.println("\t\tVehicle ID : \t\t\t\t\t" + bkng.getVehicleId());
+                                System.out.println("\t\tBooking Date & Time : \t\t\t" + bkng.getBookingDateTime());
+                                System.out.println("\t\tStarting Co-ordinates : \t\t" + bkng.getStartLocation());
+                                System.out.println("\t\tDestination Co-ordinates : \t\t" + bkng.getEndLocation());
+                                System.out.println("\n\t\tTotal Cost : \t\t\t\t\t€" + bkng.getCost());
+                                System.out.println("--------------------------------------------------------------------------------------------------------------");
+                            }
+                        }
+
                         break;
                     case SHOW_BY_BID:
                         System.out.println("Please enter Booking ID to view all related bookings");
@@ -399,14 +430,43 @@ public class App {
                         bookingManager.DisplayBookingsByBookingId(bookingID);
                         break;
                     case SHOW_BY_NAME:
-                        System.out.println("Please enter Name to view all related bookings");
-                        String name = keyboard.nextLine();
-                        bookingManager.DisplayBookingsByName(name);
+                        ArrayList<Booking> listByName = new ArrayList<>();
+                        System.out.println("List of bookings by passenger name");
+                        System.out.println("=============================");
+                        System.out.print("Enter passenger name: ");
+                        String passengerName = keyboard.nextLine();
+                        if(passengerStore.findPassengerByName(passengerName) == null)
+                        {
+                            System.out.println("Passenger doesnt exist");
+                        }
+                        else {
+                            bookingManager.showBookingsByPassengerName(passengerName, listByName);
+                            System.out.println();
+                            System.out.println("List of bookings by passenger " + passengerName + " sorted by date");
+                            System.out.println("====================================");
+                            for (Booking bkng : listByName) {
+                                System.out.println("--------------------------------------------------------------------------------------------------------------");
+                                System.out.println("\t\tBooking ID : \t\t\t\t\t" + bkng.getBookingId());
+                                System.out.println("\t\tPassenger ID : \t\t\t\t\t" + bkng.getPassengerId());
+                                System.out.println("\t\tVehicle ID : \t\t\t\t\t" + bkng.getVehicleId());
+                                System.out.println("\t\tBooking Date & Time : \t\t\t" + bkng.getBookingDateTime());
+                                System.out.println("\t\tStarting Co-ordinates : \t\t" + bkng.getStartLocation());
+                                System.out.println("\t\tDestination Co-ordinates : \t\t" + bkng.getEndLocation());
+                                System.out.println("\n\t\tTotal Cost : \t\t\t\t\t€" + bkng.getCost());
+                                System.out.println("--------------------------------------------------------------------------------------------------------------");
+                            }
+                        }
+
                         break;
                     case DEL_BY_ID:
                         System.out.println("Please enter ID of booking you'd like to delete");
                         String id = keyboard.nextLine();
                         bookingManager.DeleteBookingById(id);
+                        break;
+                    case EDIT_BOOKING:
+                        System.out.println("Please enter ID of booking you'd like to edit");
+                        String bid = keyboard.nextLine();
+                        bookingManager.editBooking(bid);
                         break;
                     case EXIT:
                         System.out.println("Exit Menu option chosen");

@@ -34,6 +34,10 @@ class Booking
         return passengerId;
     }
 
+    public void setBookingDateTime(LocalDateTime bookingDateTime) {
+        this.bookingDateTime = bookingDateTime;
+    }
+
     public LocalDateTime getBookingDateTime() {
         return bookingDateTime;
     }
@@ -56,6 +60,14 @@ class Booking
 
     public double getCost() {
         return cost;
+    }
+
+
+    public void setVehicleId(String vehicleId) {
+
+        int vID = Integer.parseInt(vehicleId);
+
+        this.vehicleId = vID;
     }
 
     @Override

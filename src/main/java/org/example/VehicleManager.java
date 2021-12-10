@@ -127,6 +127,22 @@ public class VehicleManager {
                 return null;
     }
 
+    public Vehicle findSingleVehicleById(String vID)
+    {
+        for(Vehicle v: vehicleList) {
+
+            int a = v.getId();
+            String c = Integer.toString(a);
+
+            if (c.equalsIgnoreCase(vID)) {
+                return v;
+            }
+        }
+        return null;
+    }
+
+
+
     /*public String getVehicleTypeByReg(String reg)
     {
        Vehicle found =  findSingleVehicleByReg( reg);

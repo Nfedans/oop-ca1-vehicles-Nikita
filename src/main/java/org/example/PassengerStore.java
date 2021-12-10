@@ -246,13 +246,22 @@ public class PassengerStore {
 
     public Passenger findPassengerByName(String name)
     {
-        String email = "dummy";
-        String phone = "dummy";
-        double latitude = 4;
-        double longitude = 4;
-        Passenger passenger = new Passenger(name, email, phone, latitude, longitude);
+
         for(Passenger p: passengerList) {
             if (p.getName().equalsIgnoreCase(name)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+
+    public Passenger findPassengerById(String id)
+    {
+        String c = id.toString();
+
+        for(Passenger p: passengerList) {
+            if (c.equalsIgnoreCase(id)) {
                 return p;
             }
         }
