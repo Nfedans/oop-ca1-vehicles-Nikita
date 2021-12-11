@@ -22,7 +22,17 @@ public class PassengerStore {
 
     public void displayAllPassengers() {
         for (Passenger p : this.passengerList) {
-            System.out.println(p.toString());
+            //System.out.println(p.toString());
+
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+            System.out.println("\t\tPassenger ID : \t\t\t\t\t\t"  + p.getId());
+            System.out.println("\t\tPassenger Name : \t\t\t\t\t"  + p.getName());
+            System.out.println("\t\tPassenger Email : \t\t\t\t\t"  + p.getEmail());
+            System.out.println("\t\tPassenger Phone : \t\t\t\t\t"  + p.getPhone());
+            System.out.println("\t\tLocation : \t\t\t\t\t\t\t"  + p.getLocation());
+            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+
+
         }
     }
 
@@ -121,13 +131,29 @@ public class PassengerStore {
         }
 
         while (startLatitude < -90 || startLatitude > 90) {
-            System.out.println("Enter passenger start latitude: ");
-            startLatitude = sc.nextDouble();
+            System.out.println("Enter passenger start latitude (range: -90 to 90): ");
+
+            try {
+                startLatitude = sc.nextDouble();
+            }
+            catch (InputMismatchException e)
+            {
+                System.out.println("Please enter a floating point value");
+                sc.next();
+            }
         }
 
         while (startLongitude < -180 || startLongitude > 180) {
-            System.out.println("Enter passenger longitude: ");
-            startLongitude = sc.nextDouble();
+            System.out.println("Enter passenger longitude  (range: -180 to 180): ");
+
+            try {
+                startLongitude = sc.nextDouble();
+            }
+            catch (InputMismatchException e)
+            {
+                System.out.println("Please enter a floating point value");
+                sc.next();
+            }
         }
 
        /* while (endLatitude < -90 || endLatitude > 90) {
@@ -229,19 +255,18 @@ public class PassengerStore {
         }
     }
 
-    public void deletePassengerByNameAndEmail(String name, String email)
+    public boolean deletePassengerByNameAndEmail(String name, String email)
     {
-        String phone = "dummy";
-        double latitude = 4;
-        double longitude = 4;
-        Passenger passenger = new Passenger(name, email, phone, latitude, longitude);
+        boolean validate = false;
         for (Passenger p : this.passengerList) {
-            if(p.getName().equals(passenger.getName()) && p.getEmail().equals(passenger.getEmail()))
+            if(p.getName().equals(name) && p.getEmail().equals(email))
             {
                 passengerList.remove(p);
+                validate = true;
                 break;
             }
         }
+        return validate;
     }
 
     public Passenger findPassengerByName(String name)
@@ -249,7 +274,17 @@ public class PassengerStore {
 
         for(Passenger p: passengerList) {
             if (p.getName().equalsIgnoreCase(name)) {
+
+                /*System.out.println("----------------------------------------------------------------------------------------------------------------------");
+                System.out.println("\t\tPassenger ID : \t\t\t\t\t\t"  + p.getId());
+                System.out.println("\t\tPassenger Name : \t\t\t\t\t"  + p.getName());
+                System.out.println("\t\tPassenger Email : \t\t\t\t\t"  + p.getEmail());
+                System.out.println("\t\tPassenger Phone : \t\t\t\t\t"  + p.getPhone());
+                System.out.println("\t\tLocation : \t\t\t\t\t\t\t"  + p.getLocation());
+                System.out.println("----------------------------------------------------------------------------------------------------------------------");
+                */
                 return p;
+
             }
         }
         return null;

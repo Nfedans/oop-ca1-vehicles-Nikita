@@ -46,13 +46,9 @@ public class App {
 
         vehicleManager = new VehicleManager("vehicles.txt");
 
-        bookingManager = new BookingManager(passengerStore, vehicleManager);
+        bookingManager = new BookingManager("bookings.txt",passengerStore, vehicleManager);
 
         vehicles = vehicleManager.getVehicleList();
-
-
-
-
 
 
         try {
@@ -138,13 +134,15 @@ public class App {
                 + "1. Show all Passengers\n"
                 + "2. Find Passenger by Name\n"
                 + "3. Add a Passenger\n"
-                + "4. Exit\n"
-                + "Enter Option [1,4]";
+                + "4. Delete a Passenger by ID\n"
+                + "5. Exit\n"
+                + "Enter Option [1,5]";
 
         final int SHOW_ALL = 1;
         final int FIND_BY_NAME = 2;
         final int ADD_PASSENGER = 3;
-        final int EXIT = 4;
+        final int DEL_PASSENGER = 4;
+        final int EXIT = 5;
 
         Scanner keyboard = new Scanner(System.in);
         int option = 0;
@@ -172,6 +170,22 @@ public class App {
                         System.out.println("Add a passenger");
                         passengerStore.addPassenger();
                         break;
+                    case DEL_PASSENGER:
+                        System.out.println("Enter Name of Passenger you wish to delete");
+                        String delName = keyboard.nextLine();
+                        System.out.println("Enter email of Passenger you wish to delete");
+                        String delEmail = keyboard.nextLine();
+
+                        boolean validate = passengerStore.deletePassengerByNameAndEmail(delName, delEmail);
+
+                        if(validate)
+                        {
+                            System.out.println("Deleted " + delName + " from records successfully!");
+                        }
+                        else
+                        {
+                            System.out.println("either the record didn't exist or name / email was wrong. Try again.");
+                        }
                     case EXIT:
                         System.out.println("Exit Menu option chosen");
                         break;
@@ -287,8 +301,9 @@ public class App {
                 + "6. Show bookings by Passenger Name \n"
                 + "7. Delete Booking by ID \n"
                 + "8. Edit Booking by ID \n"
-                + "9. Exit \n"
-                + "Enter Option [1,9]";
+                + "9. Show all current bookings \n"
+                + "10. Exit \n"
+                + "Enter Option [1,11]";
 
         final int SHOW_ALL = 1;
         final int ADD_A_BOOKING = 2;
@@ -298,7 +313,8 @@ public class App {
         final int SHOW_BY_NAME = 6;
         final int DEL_BY_ID = 7;
         final int EDIT_BOOKING = 8;
-        final int EXIT = 9;
+        final int SHOW_CURRENT = 9;
+        final int EXIT = 10;
 
         Scanner keyboard = new Scanner(System.in);
         int option = 0;
@@ -431,8 +447,9 @@ public class App {
                         break;
                     case SHOW_BY_NAME:
                         ArrayList<Booking> listByName = new ArrayList<>();
+                        DateComparator dc = new DateComparator();
                         System.out.println("List of bookings by passenger name");
-                        System.out.println("=============================");
+                        System.out.println("============================================");
                         System.out.print("Enter passenger name: ");
                         String passengerName = keyboard.nextLine();
                         if(passengerStore.findPassengerByName(passengerName) == null)
@@ -441,9 +458,10 @@ public class App {
                         }
                         else {
                             bookingManager.showBookingsByPassengerName(passengerName, listByName);
+                            Collections.sort(listByName, dc);
                             System.out.println();
                             System.out.println("List of bookings by passenger " + passengerName + " sorted by date");
-                            System.out.println("====================================");
+                            System.out.println("============================================");
                             for (Booking bkng : listByName) {
                                 System.out.println("--------------------------------------------------------------------------------------------------------------");
                                 System.out.println("\t\tBooking ID : \t\t\t\t\t" + bkng.getBookingId());
@@ -468,6 +486,26 @@ public class App {
                         String bid = keyboard.nextLine();
                         bookingManager.editBooking(bid);
                         break;
+                    case SHOW_CURRENT:
+                         ArrayList<Booking> listCurrent = new ArrayList<>();
+                         System.out.println("List of current bookings");
+                         bookingManager.getCurrentBookings(listCurrent);
+
+                         DateComparator dateComp = new DateComparator();
+                         Collections.sort(listCurrent, dateComp);
+
+                         for (Booking bkng : listCurrent) {
+                             System.out.println("--------------------------------------------------------------------------------------------------------------");
+                             System.out.println("\t\tBooking ID : \t\t\t\t\t" + bkng.getBookingId());
+                             System.out.println("\t\tPassenger ID : \t\t\t\t\t" + bkng.getPassengerId());
+                             System.out.println("\t\tVehicle ID : \t\t\t\t\t" + bkng.getVehicleId());
+                             System.out.println("\t\tBooking Date & Time : \t\t\t" + bkng.getBookingDateTime());
+                             System.out.println("\t\tStarting Co-ordinates : \t\t" + bkng.getStartLocation());
+                             System.out.println("\t\tDestination Co-ordinates : \t\t" + bkng.getEndLocation());
+                             System.out.println("\n\t\tTotal Cost : \t\t\t\t\t€" + bkng.getCost());
+                             System.out.println("--------------------------------------------------------------------------------------------------------------");
+                         }
+                         break;
                     case EXIT:
                         System.out.println("Exit Menu option chosen");
                         break;

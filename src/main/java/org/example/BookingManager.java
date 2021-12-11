@@ -1,5 +1,7 @@
 package org.example;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 /*import java.util.ArrayList;
@@ -19,10 +21,69 @@ public class BookingManager
 
 
     // Constructor
-    public BookingManager( PassengerStore ps, VehicleManager vm) {
+    public BookingManager(String fileName, PassengerStore ps, VehicleManager vm) {
         this.bookingList = new ArrayList<>();
+        loadBookingDataFromFile(fileName);
         passengerStore = ps;
         vehicleManager = vm;
+    }
+
+
+    private void loadBookingDataFromFile(String filename) {
+
+        try {
+            Scanner sc = new Scanner(new File(filename));
+//           Delimiter: set the delimiter to be a comma character ","
+//                    or a carriage-return '\r', or a newline '\n'
+            sc.useDelimiter("[,\r\n]+");
+
+            while (sc.hasNext()) {
+                int bookingId = sc.nextInt();
+                int passengerId = sc.nextInt();
+                int vehicleId = sc.nextInt();
+                int year = sc.nextInt();
+                int month = sc.nextInt();
+                int day = sc.nextInt();
+                double latStart = sc.nextDouble();
+                double longStart = sc.nextDouble();
+                double latEnd = sc.nextDouble();
+                double longEnd = sc.nextDouble();
+                double cost = sc.nextDouble();
+
+                LocalDateTime date = createADate(year, month, day);
+                LocationGPS startLocation = createGpsObj(latStart, longStart);
+                LocationGPS endLocation = createGpsObj(latEnd, longEnd);
+
+
+                // construct a Booking object and add it to the booking list
+                bookingList.add(new Booking(bookingId, passengerId, vehicleId, date,
+                        startLocation, endLocation, cost));
+            }
+            sc.close();
+
+        } catch (IOException e) {
+            System.out.println("Exception thrown. " + e);
+        }
+
+    }
+
+    public LocationGPS createGpsObj(double latitude, double longitude)
+    {
+        LocationGPS newLoc = new LocationGPS(latitude, longitude);
+        return newLoc;
+    }
+
+    public void getCurrentBookings(ArrayList<Booking> list)
+    {
+        LocalDateTime now = LocalDateTime.now();
+
+        for(Booking b: bookingList){
+
+            if(b.getBookingDateTime().isAfter(now))
+            {
+                list.add(b);
+            }
+        }
     }
 
     //TODO implement functionality as per specification
@@ -300,7 +361,7 @@ public class BookingManager
         LocationGPS startLocation = passenger.getLocation();
         LocationGPS depotLocation = veh.getDepotGPSLocation();
 
-        double distance1 = LocationGPS.distanceGPS(depotLocation, startLocation);
+        /*double distance1 = LocationGPS.distanceGPS(depotLocation, startLocation);
         double distance2 = LocationGPS.distanceGPS(startLocation, endLocation);
         double distance3 = LocationGPS.distanceGPS(endLocation, depotLocation);
 
@@ -314,7 +375,9 @@ public class BookingManager
         cost3 = RoundTo2DecPoints(cost3);
 
         double totalCost = cost1 + cost2 + cost3;
-        totalCost = RoundTo2DecPoints(totalCost);
+        totalCost = RoundTo2DecPoints(totalCost);*/
+
+        double totalCost =  PerfCalc(depotLocation, startLocation, endLocation, veh);
 
         Booking booking = new Booking(bookingId, passengerId, vehicleId, now, startLocation, endLocation, totalCost);
 
@@ -331,6 +394,29 @@ public class BookingManager
         bookingList.add(booking);
         return found;
     }
+
+    public double PerfCalc(LocationGPS depotLocation, LocationGPS startLocation, LocationGPS endLocation, Vehicle veh)
+    {
+        double distance1 = LocationGPS.distanceGPS(depotLocation, startLocation);
+        double distance2 = LocationGPS.distanceGPS(startLocation, endLocation);
+        double distance3 = LocationGPS.distanceGPS(endLocation, depotLocation);
+
+        double cost1 = calculateCosts(veh, distance1);
+        cost1 = RoundTo2DecPoints(cost1);
+
+        double cost2 = calculateCosts(veh, distance2);
+        cost2 = RoundTo2DecPoints(cost2);
+
+        double cost3 = calculateCosts(veh, distance3);
+        cost3 = RoundTo2DecPoints(cost3);
+
+        double totalCost = cost1 + cost2 + cost3;
+        totalCost = RoundTo2DecPoints(totalCost);
+
+        return totalCost;
+    }
+
+
 
 
 
@@ -372,6 +458,7 @@ public class BookingManager
                         Vehicle v = vehicleManager.findSingleVehicleById(vID);
                         if(v != null) {
                             booking.setVehicleId(vID);
+                            updateCost(booking);
                             System.out.println("Vehicle ID edit was successful!");
                         }
                         else
@@ -474,21 +561,110 @@ public class BookingManager
                         }
                         break;
                     case EDIT_START:
-                        //System.out.println("This is the current Start Location: " + booking.getLocation());
-                        //System.out.println("Please set the new Vehicle ID: ");
-                        //String vID = keyboard.nextLine();
-                        //Vehicle v = vehicleManager.findSingleVehicleById(vID);
-                        //if(v != null) {
-                        //    booking.setVehicleId(vID);
-                        //    System.out.println("Vehicle ID edit was successful!");
-                        //}
-                        //else
-                        //{
-                        //   System.out.println("Vehicle ID edit was unsuccessful!");
-                        //}
+                        LocationGPS loc = booking.getStartLocation();
+                        System.out.println("This is the current Start Location: " + loc);
+                        System.out.println("Click 1 to edit Latitude, 2 to edit Longitude, any other button to exit");
+                        String gpsPick = keyboard.nextLine();
+
+                        if(gpsPick.equalsIgnoreCase("1")) {
+                            System.out.println("Please enter new start latitude in range -90 to 90");
+
+                            Double lat = -100.00;
+                            try {
+                                lat = keyboard.nextDouble();
+                            }
+                            catch(InputMismatchException e){
+                                System.out.println("Please enter a value between 90 & -90");
+                            }
+                            if(lat >= -90 && lat <= 90)
+                            {
+                                double lon = loc.getLongitude();
+                                LocationGPS newLoc = new LocationGPS(lat, lon);
+                                booking.setStartLocation(newLoc);
+                                updateCost(booking);
+                                System.out.println("Latitude updated successfully");
+                            }
+                            else
+                            {
+                                System.out.println("Latitude edit was unsuccessful, please try again!");
+                            }
+                        }
+                        else if(gpsPick.equalsIgnoreCase("2")) {
+                            System.out.println("Please enter new start longitude in range -180 to 180");
+
+                            Double lon = -200.00;
+                            try {
+                                lon = keyboard.nextDouble();
+                            }
+                            catch(InputMismatchException e){
+                                System.out.println("Please enter a value between 90 & -90");
+                            }
+                            if(lon >= -180 && lon <= 180)
+                            {
+                                double lat = loc.getLatitude();
+                                LocationGPS newLoc = new LocationGPS(lat, lon);
+                                booking.setStartLocation(newLoc);
+                                updateCost(booking);
+                                System.out.println("Longitude updated successfully");
+                            }
+                            else
+                            {
+                                System.out.println("Longitude edit was unsuccessful, please try again!");
+                            }
+                        }
                         break;
                     case EDIT_DEST:
+                        LocationGPS locDest = booking.getEndLocation();
+                        System.out.println("This is the current End Location: " + locDest);
+                        System.out.println("Click 1 to edit Latitude, 2 to edit Longitude, any other button to exit");
+                        String chooseEdit = keyboard.nextLine();
 
+                        if(chooseEdit.equalsIgnoreCase("1")) {
+                            System.out.println("Please enter new end latitude in range -90 to 90");
+
+                            Double lat = -100.00;
+                            try {
+                                lat = keyboard.nextDouble();
+                            }
+                            catch(InputMismatchException e){
+                                System.out.println("Please enter a value between 90 & -90");
+                            }
+                            if(lat >= -90 && lat <= 90)
+                            {
+                                double lon = locDest.getLongitude();
+                                LocationGPS newLoc = new LocationGPS(lat, lon);
+                                booking.setEndLocation(newLoc);
+                                updateCost(booking);
+                                System.out.println("Latitude updated successfully");
+                            }
+                            else
+                            {
+                                System.out.println("Latitude edit was unsuccessful, please try again!");
+                            }
+                        }
+                        else if(chooseEdit.equalsIgnoreCase("2")) {
+                            System.out.println("Please enter new end longitude in range -180 to 180");
+
+                            Double lon = -200.00;
+                            try {
+                                lon = keyboard.nextDouble();
+                            }
+                            catch(InputMismatchException e){
+                                System.out.println("Please enter a value between 90 & -90");
+                            }
+                            if(lon >= -180 && lon <= 180)
+                            {
+                                double lat = locDest.getLatitude();
+                                LocationGPS newLoc = new LocationGPS(lat, lon);
+                                booking.setEndLocation(newLoc);
+                                updateCost(booking);
+                                System.out.println("Longitude updated successfully");
+                            }
+                            else
+                            {
+                                System.out.println("Longitude edit was unsuccessful, please try again!");
+                            }
+                        }
                         break;
                     case EXIT:
                         System.out.println("Exit Menu option chosen");
@@ -504,6 +680,29 @@ public class BookingManager
 
 }
 
+
+
+    public void updateCost(Booking booking)
+    {
+
+        LocationGPS startLocation = booking.getStartLocation();
+        LocationGPS endLocation = booking.getEndLocation();
+        int vID = booking.getVehicleId();
+        String vIdParsed = Integer.toString(vID);
+        Vehicle targetVeh = vehicleManager.findSingleVehicleById(vIdParsed);
+        LocationGPS depotLocation = targetVeh.getDepotGPSLocation();
+
+
+        double totalCost =  PerfCalc(depotLocation, startLocation, endLocation, targetVeh);
+
+        booking.setCost(totalCost);
+    }
+
+    public LocalDateTime createADate(int year, int month, int day)
+    {
+        LocalDateTime newDate = LocalDateTime.of(year, month, day, 0, 0);
+        return newDate;
+    }
 
     public void dealWithYear(Booking booking, int year)
     {

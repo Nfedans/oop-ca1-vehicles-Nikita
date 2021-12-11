@@ -62,6 +62,17 @@ class Booking
         return cost;
     }
 
+    public void setCost(double cost) {
+        this.cost = cost;
+    }
+
+    public void setStartLocation(LocationGPS startLocation) {
+        this.startLocation = startLocation;
+    }
+
+    public void setEndLocation(LocationGPS endLocation) {
+        this.endLocation = endLocation;
+    }
 
     public void setVehicleId(String vehicleId) {
 

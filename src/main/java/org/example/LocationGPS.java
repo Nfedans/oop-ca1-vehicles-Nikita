@@ -32,6 +32,8 @@ public class LocationGPS
     }
 
 
+    // Mathematical equation reference
+    // https://www.geeksforgeeks.org/haversine-formula-to-find-distance-between-two-points-on-a-sphere/
     public static double distanceGPS(LocationGPS startLoc, LocationGPS endLoc)
     {
 
