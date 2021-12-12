@@ -206,4 +206,17 @@ public class VehicleManager {
     }
 */
 
+
+    public List<Vehicle> filterBy(IFilter filter)            // I stands for Interface
+    {
+        List<Vehicle> filteredList = new ArrayList<>();
+        for (Vehicle v : this.vehicleList) {
+            if (filter.matches(v))    // use matches() method of the filter to match products
+                filteredList.add(v);
+        }
+
+        return filteredList;
+    }
+
+
 }

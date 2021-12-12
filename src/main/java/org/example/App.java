@@ -29,6 +29,7 @@ public class App {
     Booking booking;
     Vehicle vehicle;
     ArrayList<Vehicle> vehicles;
+    EmailManager emailManager;
 
     public static void main(String[] args) {
         App app = new App();
@@ -49,6 +50,8 @@ public class App {
         bookingManager = new BookingManager("bookings.txt",passengerStore, vehicleManager);
 
         vehicles = vehicleManager.getVehicleList();
+
+        emailManager = new EmailManager(passengerStore, bookingManager);
 
 
         try {
@@ -207,15 +210,17 @@ public class App {
                 + "1. Show all Vehicles\n"
                 + "2. Find Vehicle by registration\n"
                 + "3. Sort and view vehicles by registration \n"
-                + "4. Find Vehicles by type \n"
-                + "5. Exit \n"
+                + "4. Filter Vehicles by type \n"
+                + "5. Filter Cars by number of seats \n"
+                + "6. Exit \n"
                 + "Enter Option [1,5]";
 
         final int SHOW_ALL = 1;
         final int FIND_BY_REG = 2;
         final int SORT_BY_REG = 3;
-        final int FIND_BY_VEHI_TYPE = 4;
-        final int EXIT = 5;
+        final int FILTER_BY_VEHI_TYPE = 4;
+        final int FILTER_BY_NUM_SEATS = 5;
+        final int EXIT = 6;
 
         Scanner keyboard = new Scanner(System.in);
         int option = 0;
@@ -228,7 +233,34 @@ public class App {
                     case SHOW_ALL:
                         System.out.println("Display ALL Vehicles");
                         //vehicleManager.displayAllVehicles();
-                        display(vehicleManager.getVehicleList());
+                        //display(vehicleManager.getVehicleList());
+                        ArrayList<Vehicle> vList = vehicleManager.getVehicleList();
+
+                        for(Vehicle veh: vList)
+                        {
+                        System.out.println("----------------------------------------------------------------------------------------------------");
+                        System.out.println("\t\tVehicle ID : \t\t\t\t" + veh.getId());
+                        System.out.println("\t\tVehicle Type : \t\t\t\t" + veh.getType());
+                        System.out.println("\t\tVehicle Make : \t\t\t\t" + veh.getMake());
+                        System.out.println("\t\tVehicle Model : \t\t\t" + veh.getModel());
+                        System.out.println("\t\tVehicle registration : \t\t" + veh.getRegistration());
+                        System.out.println("\t\tVehicle cost per mile : \t€" + veh.getCostPerMile());
+                        System.out.println("\t\tLast service date : \t\t" + veh.getLastServicedDate());
+                        System.out.println("\t\tVehicle Mileage : \t\t\t" + veh.getMileage());
+                        System.out.println("\t\tVehicle Location : \t\t\t" + veh.getDepotGPSLocation());
+
+                        if(veh instanceof Car)
+                        {
+
+                             System.out.println("\t\tNumber of seats : \t\t\t" + ((Car)veh).getNumSeats());
+                             System.out.println("----------------------------------------------------------------------------------------------------");
+                        }
+                        else
+                        {
+                            System.out.println("\t\tLoad Space : \t\t\t\t" + ((Van)veh).getLoadSpace());
+                            System.out.println("----------------------------------------------------------------------------------------------------");
+                        }
+                        }
                         break;
                     case FIND_BY_REG:
                         System.out.println("Find Vehicle by registration");
@@ -249,33 +281,65 @@ public class App {
 
 
 
-                    case FIND_BY_VEHI_TYPE:
-                        String vehiType= "";
-                        String input = "";
-                        System.out.println("Find Vehicle by Type");
+                    case FILTER_BY_VEHI_TYPE:
+                           System.out.println("Input the type of vehicle you'd like to filter by: (Car / 4x4 / Truck / Van)");
+                           String typeFilter = keyboard.nextLine();
+                           List<Vehicle> typeList = vehicleManager.filterBy(new VehicleTypeFilter(typeFilter));
 
-                        while(!(vehiType.equals("v")) && !(vehiType.equals("c"))) {
-                            System.out.println("Enter v for VAN  /  Enter c for CAR: ");
-                            vehiType = keyboard.nextLine();
-                            vehiType = vehiType.toLowerCase();
-                        }
-                        if(vehiType.equals("v")){
-                            input = "Van";
-                        }
-                        else{
-                            input = "Car";
-                        }
-                        if(vehicleManager.findVehicleByType(input) == null)
-                        {
-                            System.out.println("Sorry, we found nothing");
-                        }
-                        else {
-                            display(vehicleManager.findVehicleByType(input));
-                        }
+                           if(typeList != null) {
+                               for (Vehicle veh : typeList) {
+                                   System.out.println("----------------------------------------------------------------------------------------------------");
+                                   System.out.println("\t\tVehicle ID : \t\t\t\t" + veh.getId());
+                                   System.out.println("\t\tVehicle Type : \t\t\t\t" + veh.getType());
+                                   System.out.println("\t\tVehicle Make : \t\t\t\t" + veh.getMake());
+                                   System.out.println("\t\tVehicle Model : \t\t\t" + veh.getModel());
+                                   System.out.println("\t\tVehicle registration : \t\t" + veh.getRegistration());
+                                   System.out.println("\t\tVehicle cost per mile : \t€" + veh.getCostPerMile());
+                                   System.out.println("\t\tLast service date : \t\t" + veh.getLastServicedDate());
+                                   System.out.println("\t\tVehicle Mileage : \t\t\t" + veh.getMileage());
+                                   System.out.println("\t\tVehicle Location : \t\t\t" + veh.getDepotGPSLocation());
+
+                                   if(typeFilter.equalsIgnoreCase("car") || typeFilter.equalsIgnoreCase("4x4") )
+                                   {
+
+                                        System.out.println("\t\tNumber of seats : \t\t\t" + ((Car)veh).getNumSeats());
+                                        System.out.println("----------------------------------------------------------------------------------------------------");
+                                   }
+                                   else
+                                   {
+                                       System.out.println("\t\tLoad Space : \t\t\t\t" + ((Van)veh).getLoadSpace());
+                                       System.out.println("----------------------------------------------------------------------------------------------------");
+                                   }
+
+                               }
+
+
+                           }
                         break;
+                    case FILTER_BY_NUM_SEATS:
 
+                    System.out.println("Input the number of seats you'd like to filter cars by:");
+                    String numberSeats = keyboard.nextLine();
+                    numberSeats = numberSeats + ".0";
+                    List<Vehicle> carList = vehicleManager.filterBy(new NumSeatFilter(numberSeats));
 
-
+                    if(carList != null) {
+                        for (Vehicle veh : carList) {
+                            System.out.println("----------------------------------------------------------------------------------------------------");
+                            System.out.println("\t\tVehicle ID : \t\t\t\t" + veh.getId());
+                            System.out.println("\t\tVehicle Type : \t\t\t\t" + veh.getType());
+                            System.out.println("\t\tVehicle Make : \t\t\t\t" + veh.getMake());
+                            System.out.println("\t\tVehicle Model : \t\t\t" + veh.getModel());
+                            System.out.println("\t\tVehicle registration : \t\t" + veh.getRegistration());
+                            System.out.println("\t\tVehicle cost per mile : \t€" + veh.getCostPerMile());
+                            System.out.println("\t\tLast service date : \t\t" + veh.getLastServicedDate());
+                            System.out.println("\t\tVehicle Mileage : \t\t\t" + veh.getMileage());
+                            System.out.println("\t\tVehicle Location : \t\t\t" + veh.getDepotGPSLocation());
+                            System.out.println("\t\tNumber of seats : \t\t\t" + ((Car)veh).getNumSeats());
+                            System.out.println("----------------------------------------------------------------------------------------------------");
+                        }
+                    }
+                        break;
                     case EXIT:
                         System.out.println("Exit Menu option chosen");
                         break;
@@ -302,7 +366,10 @@ public class App {
                 + "7. Delete Booking by ID \n"
                 + "8. Edit Booking by ID \n"
                 + "9. Show all current bookings \n"
-                + "10. Exit \n"
+                + "10. Filter bookings by year \n"
+                + "11. Get average length of booking journeys \n"
+                + "12. View mailing list \n"
+                + "13. Exit \n"
                 + "Enter Option [1,11]";
 
         final int SHOW_ALL = 1;
@@ -314,7 +381,10 @@ public class App {
         final int DEL_BY_ID = 7;
         final int EDIT_BOOKING = 8;
         final int SHOW_CURRENT = 9;
-        final int EXIT = 10;
+        final int SHOW_FILTERED_BY_YEAR = 10;
+        final int GET_AVG = 11;
+        final int VIEW_MAIL_LIST = 12;
+        final int EXIT = 13;
 
         Scanner keyboard = new Scanner(System.in);
         int option = 0;
@@ -387,6 +457,9 @@ public class App {
                         LocationGPS endLocation = new LocationGPS(endLat, endLong);
 
                        boolean bk = bookingManager.addBooking(bookingId, checkVeh, checkPass, endLocation);
+
+                       String idForEmail = Integer.toString(bookingId);
+                       emailManager.addEmail(idForEmail, checkPass);
 
                        if (bk == false)
                        {
@@ -474,7 +547,22 @@ public class App {
                                 System.out.println("--------------------------------------------------------------------------------------------------------------");
                             }
                         }
+                                   System.out.println("Filter by Year...");
+                                   List<Booking> bList = bookingManager.filterBy(new BookingYearFilter("2021"));
+                                   System.out.println(bList);
 
+                        
+                               for (Booking bkng : bList) {
+                                   System.out.println("--------------------------------------------------------------------------------------------------------------");
+                                   System.out.println("\t\tBooking ID : \t\t\t\t\t" + bkng.getBookingId());
+                                   System.out.println("\t\tPassenger ID : \t\t\t\t\t" + bkng.getPassengerId());
+                                   System.out.println("\t\tVehicle ID : \t\t\t\t\t" + bkng.getVehicleId());
+                                   System.out.println("\t\tBooking Date & Time : \t\t\t" + bkng.getBookingDateTime());
+                                   System.out.println("\t\tStarting Co-ordinates : \t\t" + bkng.getStartLocation());
+                                   System.out.println("\t\tDestination Co-ordinates : \t\t" + bkng.getEndLocation());
+                                   System.out.println("\n\t\tTotal Cost : \t\t\t\t\t€" + bkng.getCost());
+                                   System.out.println("--------------------------------------------------------------------------------------------------------------");
+                               }
                         break;
                     case DEL_BY_ID:
                         System.out.println("Please enter ID of booking you'd like to delete");
@@ -506,6 +594,47 @@ public class App {
                              System.out.println("--------------------------------------------------------------------------------------------------------------");
                          }
                          break;
+                    case SHOW_FILTERED_BY_YEAR:
+
+                              System.out.println("Type in year you'd like to filter by: ");
+                              String yrFilter = keyboard.nextLine();
+                              List<Booking> bkList = bookingManager.filterBy(new BookingYearFilter(yrFilter));
+
+                              if(bkList != null) {
+                                  
+                              DateComparator yc = new DateComparator();
+
+                              Collections.sort(bkList, yc);
+
+                                  for (Booking bkng : bkList) {
+                                      System.out.println("--------------------------------------------------------------------------------------------------------------");
+                                      System.out.println("\t\tBooking ID : \t\t\t\t\t" + bkng.getBookingId());
+                                      System.out.println("\t\tPassenger ID : \t\t\t\t\t" + bkng.getPassengerId());
+                                      System.out.println("\t\tVehicle ID : \t\t\t\t\t" + bkng.getVehicleId());
+                                      System.out.println("\t\tBooking Date & Time : \t\t\t" + bkng.getBookingDateTime());
+                                      System.out.println("\t\tStarting Co-ordinates : \t\t" + bkng.getStartLocation());
+                                      System.out.println("\t\tDestination Co-ordinates : \t\t" + bkng.getEndLocation());
+                                      System.out.println("\n\t\tTotal Cost : \t\t\t\t\t€" + bkng.getCost());
+                                      System.out.println("--------------------------------------------------------------------------------------------------------------");
+                                  }
+                              }
+                        break;
+                    case GET_AVG:
+                         double avg = bookingManager.getAvg();
+                         double avgRounded = bookingManager.RoundTo2DecPoints(avg);
+                        System.out.println("\n\nThis is the average length of booking journeys : " + avgRounded);
+                        break;
+                    case VIEW_MAIL_LIST:
+                        System.out.println("Here's the current mailing list: ");
+                        ArrayList<Email> mailingList = emailManager.getMailingList();
+
+                        if(mailingList != null) {
+                            for (Email ml : mailingList) {
+                                String res = ml.toString();
+                                System.out.println(res);
+                            }
+                        }
+                        break;
                     case EXIT:
                         System.out.println("Exit Menu option chosen");
                         break;

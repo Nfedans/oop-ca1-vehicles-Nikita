@@ -813,6 +813,34 @@ public class BookingManager
         return id;
     }
 
+    public double getAvg()
+    {
+        // The annotated CA mentioned to do it this way
+        //"Iterate over the bookings list, sum up the totals of cost x distance,
+        // the divide by the count."
+
+        double runningTot = 0;
+        double counter = 0;
+        for (Booking b : bookingList) {
+             runningTot = runningTot + b.getCost();
+             counter++;
+        }
+        double total = runningTot/counter;
+        return total;
+    }
+
+
+    public List<Booking> filterBy(IFilter filter)            // I stands for Interface
+    {
+        List<Booking> filteredList = new ArrayList<>();
+        for (Booking b : this.bookingList) {
+            if (filter.matches(b))    // use matches() method of the filter to match products
+                filteredList.add(b);
+        }
+
+        return filteredList;
+    }
+
 
 
 }
