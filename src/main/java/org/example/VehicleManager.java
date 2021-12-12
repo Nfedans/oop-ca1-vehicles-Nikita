@@ -1,14 +1,17 @@
 package org.example;
 //
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
 public class VehicleManager {
-    private final ArrayList<Vehicle> vehicleList;  // for Car and Van objects
+    private final ArrayList<Vehicle> vehicleList;
 
     public VehicleManager(String fileName) {
         this.vehicleList = new ArrayList<>();
@@ -31,7 +34,7 @@ public class VehicleManager {
         ArrayList<Vehicle> filteredVehicles = this.getVehicleList();
         Iterator<Vehicle> iterator = filteredVehicles.iterator();
 
-        //must clear input for this to work over and over
+
 
         if(input.equals("Car"))
         {
@@ -115,6 +118,48 @@ public class VehicleManager {
         }
     }
 
+
+    public void writeVehicleDataToFile(String fileName) throws FileNotFoundException {
+
+        // create a print writer class
+        PrintWriter pw = new PrintWriter(fileName);
+
+
+        for (Vehicle v : this.vehicleList) {
+            pw.print(v.getId() + ",");
+            pw.print(v.getType() + ",");
+            pw.print(v.getMake() + ",");
+            pw.print(v.getModel() + ",");
+            pw.print(v.getMilesPerKm() + ",");
+            pw.print(v.getRegistration() + ",");
+            pw.print(v.getCostPerMile() + ",");
+
+            LocalDate lastServ = v.getLastServicedDate();
+            pw.print(lastServ.getYear() + ",");
+            pw.print(lastServ.getMonthValue() + ",");
+            pw.print(lastServ.getDayOfMonth() + ",");
+            pw.print(v.getMileage() + ",");
+
+            LocationGPS depotLoc = v.getDepotGPSLocation();
+
+            pw.print(depotLoc.getLatitude() + ",");
+            pw.print(depotLoc.getLongitude() + ",");
+
+            if(v instanceof Car)
+            {
+                pw.print(Math.round(((Car)v).getNumSeats()) + "\n");
+            }
+            else
+            {
+                pw.print(Math.round(((Van)v).getLoadSpace()) + "\n");
+            }
+        }
+
+        pw.close();
+    }
+
+
+
     //TODO add more functionality as per spec.
 
     public Vehicle findSingleVehicleByReg(String reg)
@@ -141,70 +186,6 @@ public class VehicleManager {
         return null;
     }
 
-
-
-    /*public String getVehicleTypeByReg(String reg)
-    {
-       Vehicle found =  findSingleVehicleByReg( reg);
-       String typeOfVehicle = found.getType();
-
-       return typeOfVehicle;
-    }*/
-
-   /*        public double calculateCosts(String type, double distance)
-    {
-        double total = 0;
-        double rawTotal = 0;
-
-        if (type.equalsIgnoreCase("Car"))
-        {
-            rawTotal = distance * 2.00;
-            return rawTotal;
-        }
-        else if (type.equalsIgnoreCase("4x4"))
-        {
-            rawTotal = distance * 4.00;
-            return rawTotal;
-        }
-        else if (type.equalsIgnoreCase("van"))
-        {
-            rawTotal = distance * 6.00;
-            return rawTotal;
-        }
-        else if (type.equalsIgnoreCase("truck"))
-        {
-            rawTotal = distance * 10.00;
-            return rawTotal;
-        }
-       return -1;
-    }       */
-
-   /* public void addVehiclesToList(List<Vehicle> vehiclesList, String type) {
-        for (Vehicle v : this.vehicleList) {
-            vehiclesList.add( new Van(v.getId(), v.getType(), v.getMake(), v.getModel(),
-                    v.getMilesPerKm(), v.getRegistration(), v.getCostPerMile(), v.getLastServicedDate(),
-                    ));
-        }
-    }*/
-
-    // Add to menu, write methods, make comparators
-/*
-    public void Vehicle findVehicleByRegistration()
-    {
-
-    }
-
-    public void Vehicle findVehicleByType()
-    {
-
-    }
-
-    // this one should return an arraylist of all vehicles
-    public void Vehicle findAllVehicles()
-    {
-
-    }
-*/
 
 
     public List<Vehicle> filterBy(IFilter filter)            // I stands for Interface

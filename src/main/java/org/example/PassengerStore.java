@@ -1,7 +1,6 @@
 package org.example;
 //
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -66,25 +65,27 @@ public class PassengerStore {
         }
     }
 
-    // TODO - see functional spec for details of code to add
+    public void writePassengerDataToFile(String fileName) throws FileNotFoundException {
 
-   /* public boolean addPassenger(String name, String email, String phone, double latitude, double longitude)
-    {
-        Passenger passenger = new Passenger(name, email, phone, latitude, longitude);
-        boolean found = false;
-        // loop through here and check that email and password of passengers dont match
-        for(Passenger p: passengerList)
-        {
-            if(p.equals(passenger))
-            {
-                found = true;
-                return found;
-            }
+        // create a print writer class
+        PrintWriter pw = new PrintWriter(fileName);
+
+
+        for (Passenger p : this.passengerList) {
+            pw.print(p.getId() + ",");
+            pw.print(p.getName() + ",");
+            pw.print(p.getEmail() + ",");
+            pw.print(p.getPhone() + ",");
+
+            LocationGPS passLoc = p.getLocation();
+
+            pw.print(passLoc.getLatitude() + ",");
+            pw.print(passLoc.getLongitude() + "\n");
         }
-        passengerList.add(passenger);
-        return found;
 
-    }*/
+        pw.close();
+    }
+
 
     public void addPassenger()
     {
@@ -156,16 +157,6 @@ public class PassengerStore {
             }
         }
 
-       /* while (endLatitude < -90 || endLatitude > 90) {
-            System.out.println("Enter passenger start latitude: ");
-            endLatitude = sc.nextDouble();
-        }
-
-        while (endLongitude < -180 || endLongitude > 180) {
-            System.out.println("Enter passenger longitude: ");
-            endLongitude = sc.nextDouble();
-        }*/
-
         int id = 0;
         Passenger passenger = new Passenger(name, email, phone, startLatitude,  startLongitude);
         for(Passenger p: passengerList) {
@@ -179,68 +170,97 @@ public class PassengerStore {
     }
 
 
-    //
-    // Delete, edit, print methods
 
-    public void editPassenger(String name, String email, String phone, double latitude, double longitude)
+    public void editPassenger(String PassengerID)
     {
-        Scanner sc = new Scanner(System.in);
-
-
-        Passenger passenger = new Passenger(name, email, phone, latitude, longitude);
-        boolean found = false;
-        for (Passenger p: passengerList)
+        Passenger targetPass = findPassengerById(PassengerID);
+        System.out.println(targetPass);
+        Scanner keyboard = new Scanner(System.in);
+        if (targetPass != null)
         {
-            if(p.equals(passenger))
+            boolean exit = false;
+            String newName ="";
+            String newEmail ="";
+            String newPhone ="";
+            double startLatitude = -100;
+            double startLongitude = -200;
+
+
+
+
+            while(exit == false)
             {
-                //Validation and/or exception handling
-                System.out.println("\nPlease enter new name");
-                String newName = sc.nextLine();
-                if(newName != null)
+                final String MENU = "\n*** PASSENGER EDITOR ***\n"
+                        + "1. Edit name\n"
+                        + "2. Edit email\n"
+                        + "3. Edit phone \n"
+                        + "4. Edit Location \n"
+                        + "5. Exit \n"
+                        + "Enter Option [1,5]";
+                        System.out.println(MENU);
+                String usersInput = keyboard.nextLine();
+
+                if(usersInput.equalsIgnoreCase("1"))
                 {
-                    p.setName(newName);
+                    System.out.println("please enter new name ");
+                    newName = keyboard.nextLine();
+                    targetPass.setName(newName);
+                }
+                else if(usersInput.equalsIgnoreCase("2"))
+                {
+                    System.out.println("please enter new email ");
+                    newEmail = keyboard.nextLine();
+                    targetPass.setEmail(newEmail);
+
+                }
+                else if(usersInput.equalsIgnoreCase("3"))
+                {
+                    System.out.println("please enter new phone ");
+                    newPhone = keyboard.nextLine();
+                    targetPass.setPhone(newPhone);
+
+                }
+                else if(usersInput.equalsIgnoreCase("4"))
+                {
+
+                    while (startLatitude < -90 || startLatitude > 90) {
+                        System.out.println("Enter passenger start latitude (range: -90 to 90): ");
+
+                        try {
+                            startLatitude = keyboard.nextDouble();
+                        }
+                        catch (InputMismatchException e)
+                        {
+                            System.out.println("Please enter a floating point value");
+                            keyboard.next();
+                        }
+                    }
+
+                    while (startLongitude < -180 || startLongitude > 180) {
+                        System.out.println("Enter passenger longitude  (range: -180 to 180): ");
+
+                        try {
+                            startLongitude = keyboard.nextDouble();
+                        }
+                        catch (InputMismatchException e)
+                        {
+                            System.out.println("Please enter a floating point value");
+                            keyboard.next();
+                        }
+                    }
+                    targetPass.setLocation(startLatitude,startLongitude);
                 }
                 else
                 {
-                    p.setName(name);
+                    exit = true;
                 }
-                System.out.println("\nPlease enter new email");
-                String newEmail = sc.nextLine();
-                if(newEmail != null)
-                {
-                    p.setEmail(newEmail);
-                }
-                else
-                {
-                    p.setEmail(email);
-                }
-                System.out.println("\nPlease enter new Phone number");
-                String newPhone = sc.nextLine();
-                if(newPhone != null)
-                {
-                    p.setPhone(newPhone);
-                }
-                else
-                {
-                    p.setPhone(phone);
-                }
-                System.out.println("\nPlease enter latitude");
-                double latit = 0.0;
-                latit = sc.nextDouble();
-                System.out.println("\nPlease enter longitude");
-                double longit = 0.0;
-                longit = sc.nextDouble();
-                if(latit != 0.0 && longit != 0.0)
-                {
-                    p.setLocation(latit, longit);
-                }
-                else
-                {
-                    p.setLocation(latit, longit);
-                }
-                break;
             }
         }
+        else
+        {
+            System.out.println("No customer exists for the ID you specified");
+        }
+
     }
 
     public void deletePassenger(String name, String email, String phone, double latitude, double longitude )
@@ -293,9 +313,11 @@ public class PassengerStore {
 
     public Passenger findPassengerById(String id)
     {
-        String c = id.toString();
 
         for(Passenger p: passengerList) {
+
+            String c = Integer.toString(p.getId());
+
             if (c.equalsIgnoreCase(id)) {
                 return p;
             }
@@ -303,4 +325,4 @@ public class PassengerStore {
         return null;
     }
 
-} // end class
+}

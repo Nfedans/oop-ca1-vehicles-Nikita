@@ -4,29 +4,26 @@ import java.time.LocalDate;
 
 public abstract class Vehicle
 {
-    private IdGenerator idGenerator = IdGenerator.getInstance("next-id-store.txt");  // get access to the id Generator
+    private IdGenerator idGenerator = IdGenerator.getInstance("next-id-store.txt");
 
     private int id;
-    private String type;    // type of vehicle "Truck","Van","4x4", "Car" ...
+    private String type;
     private String make;
     private String model;
     private double milesPerKwH;
     private String registration;
     private double costPerMile;
     private LocalDate lastServicedDate;
-    private int mileage; // mileage recorded at last service
+    private int mileage;
     private LocationGPS depotGPSLocation;
 
-    // Constructor called when a new Vehicle is being created.
-    // No vehicle id is passed in as an argument,
-    // so the constructor will autogenerate the id.
-    //
+
     public Vehicle(String type, String make, String model, double milesPerKwH,
                    String registration, double costPerMile,
                    int year, int month, int day,
                    int mileage, double latitude, double longitude)
     {
-        this.id = idGenerator.getNextId();  // auto generated id (new for each run of the system)
+        this.id = idGenerator.getNextId();
         this.type = type;
         this.make = make;
         this.model = model;
@@ -38,10 +35,7 @@ public abstract class Vehicle
         this.depotGPSLocation = new LocationGPS(latitude,longitude);
     }
 
-    // Constructor to create a Vehicle object, when the id is available.
-    // So this is called to construct a Vehicle when the vehicle record is read from
-    // the vehicles.txt file, and the id is known.
-    //
+
     public Vehicle(int id, String type, String make, String model, double milesPerKwH,
                    String registration, double costPerMile,
                    int year, int month, int day,
@@ -62,7 +56,7 @@ public abstract class Vehicle
     public int getId() {
         return id;
     }
-    private void setId() {}; // prevents the id from being set (as it should only come from autogenerator)
+    private void setId() {};
 
     public String getMake()
     {
@@ -139,8 +133,6 @@ public abstract class Vehicle
 
         Vehicle other = (Vehicle) otherObject;
 
-        // may run into ordering issue later on
-
         return make.equals(other.getMake()) &&
                 model.equals(other.getModel()) &&
                 milesPerKwH == other.getMilesPerKm() &&
@@ -150,10 +142,7 @@ public abstract class Vehicle
                 mileage == other.getMileage() &&
                 depotGPSLocation.equals(other.getDepotGPSLocation()) &&
                 type.equals(other.getType());
-
-
     }
-
 
     @Override
     public String toString()

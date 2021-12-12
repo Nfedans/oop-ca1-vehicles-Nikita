@@ -31,9 +31,6 @@ public class Passenger {
         this.location = new LocationGPS(latitude, longitude);
     }
 
-    // Version of constructor called when the passenger id is known,
-    // as it was read from the "passengers.txt" file.
-    //
     public Passenger(int id, String name, String email, String phone,
                      double latitude, double longitude) {
 
@@ -52,7 +49,7 @@ public class Passenger {
         return id;
     }
 
-    private void setId() {}; // prevents the id from being set (as it should only come from autogenerator)
+    private void setId() {};
 
     public String getName() {
         return name;

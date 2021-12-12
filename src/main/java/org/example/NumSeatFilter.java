@@ -8,17 +8,6 @@ public class NumSeatFilter implements IFilter{
         this.numSeats = numSeats;
     }
 
-   /* @Override
-    public boolean matches(Object other) {
-        Car c = (Car) other;
-
-        double gottenSeats = c.getNumSeats();
-        String nS = Double.toString(gottenSeats);
-
-        return nS.equalsIgnoreCase(numSeats);
-    }*/
-
-
     @Override
     public boolean matches(Object other)
     {

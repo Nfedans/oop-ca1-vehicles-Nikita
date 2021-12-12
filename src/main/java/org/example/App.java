@@ -1,81 +1,37 @@
 package org.example;
 
-/** NIKITA
- * This Vehicle Bookings Management Systems manages the booking of Vehicles
- * by Passengers.
- *
- * This program reads from 3 text files:
- * "vehicles.txt", "passengers.txt", and "next-id-store.txt"
- * You should be able to see them in the project pane.
- * You will create "bookings.txt" at a later stage, to store booking records.
- *
- * "next-id-store.txt" contains one number ("201"), which will be the
- * next auto-generated id to be used to when new vehicles, passengers, or
- * bookings are created.  The value in the file will be updated when new objects
- * are created - but not when objects are recreated from records in
- * the files - as they already have IDs.  Dont change it - it will be updated by
- * the IdGenerator class.
- *
- */
+/** NIKITA FEDANS SD2A*/
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
 public class App {
-    // Components (objects) used in this App
-    PassengerStore passengerStore;  // encapsulates access to list of Passengers
-    VehicleManager vehicleManager;  // encapsulates access to list of Vehicles
-    BookingManager bookingManager;  // deals with all bookings
+    PassengerStore passengerStore;
+    VehicleManager vehicleManager;
+    BookingManager bookingManager;
     Booking booking;
     Vehicle vehicle;
     ArrayList<Vehicle> vehicles;
     EmailManager emailManager;
+    Passenger passenger;
 
     public static void main(String[] args) {
         App app = new App();
         app.start();
     }
 
-
-
-
     public void start() {
-        // create PassengerStore and load all passenger records from text file
-        passengerStore = new PassengerStore("passengers.txt");
-
-        // create VehicleManager, and load all vehicles from text file3
-
-        vehicleManager = new VehicleManager("vehicles.txt");
-
-        bookingManager = new BookingManager("bookings.txt",passengerStore, vehicleManager);
-
+        passengerStore = new PassengerStore("pass.txt");
+        vehicleManager = new VehicleManager("v.txt");
+        bookingManager = new BookingManager("b.txt",passengerStore, vehicleManager, passenger, booking);
         vehicles = vehicleManager.getVehicleList();
-
         emailManager = new EmailManager(passengerStore, bookingManager);
-
-
         try {
             displayMainMenu();        // User Interface - Menu
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-        //   vehicleManager.displayAllVehicles();
-
-
-        //   String registration = "172LH234106";
-        //   Vehicle vehicle = vehicleManager.findVehicleByReg(registration);
-        //   if (vehicle == null)
-        //       System.out.println("No vehicle with registration " + registration + " was found.");
-        //   else
-        //       System.out.println("Found Vehicle: " + vehicle.toString());
-
-        // Create BookingManager and load all bookings from file
-        // bookingManager = new BookingManager("bookings.txt");
-
-        //pMgr.saveToFile();
-
         System.out.println("Program ending, Goodbye");
     }
 
@@ -115,6 +71,9 @@ public class App {
                         break;
                     case EXIT:
                         System.out.println("Exit Menu option chosen");
+                        passengerStore.writePassengerDataToFile("pass.txt");
+                        vehicleManager.writeVehicleDataToFile("v.txt");
+                        bookingManager.writeBookingDataToFile("b.txt");
                         break;
                     default:
                         System.out.print("Invalid option - please enter number in range");
@@ -137,15 +96,17 @@ public class App {
                 + "1. Show all Passengers\n"
                 + "2. Find Passenger by Name\n"
                 + "3. Add a Passenger\n"
-                + "4. Delete a Passenger by ID\n"
-                + "5. Exit\n"
-                + "Enter Option [1,5]";
+                + "4. Delete a Passenger by Name and email\n"
+                + "5. Edit a Passenger\n"
+                + "6. Exit\n"
+                + "Enter Option [1,6]";
 
         final int SHOW_ALL = 1;
         final int FIND_BY_NAME = 2;
         final int ADD_PASSENGER = 3;
         final int DEL_PASSENGER = 4;
-        final int EXIT = 5;
+        final int EDIT_PASSENGER = 5;
+        final int EXIT = 6;
 
         Scanner keyboard = new Scanner(System.in);
         int option = 0;
@@ -164,10 +125,20 @@ public class App {
                         System.out.println("Enter passenger name: ");
                         String name = keyboard.nextLine();
                         Passenger p = passengerStore.findPassengerByName(name);
-                        if (p == null)
+                        if (p == null) {
                             System.out.println("No passenger matching the name \"" + name + "\"");
-                        else
-                            System.out.println("Found passenger: \n" + p.toString());
+                        }
+                        else {
+                            System.out.println("Found passenger: \n");
+
+                            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+                            System.out.println("\t\tPassenger ID : \t\t\t\t\t\t"  + p.getId());
+                            System.out.println("\t\tPassenger Name : \t\t\t\t\t"  + p.getName());
+                            System.out.println("\t\tPassenger Email : \t\t\t\t\t"  + p.getEmail());
+                            System.out.println("\t\tPassenger Phone : \t\t\t\t\t"  + p.getPhone());
+                            System.out.println("\t\tLocation : \t\t\t\t\t\t\t"  + p.getLocation());
+                            System.out.println("----------------------------------------------------------------------------------------------------------------------");
+                        }
                         break;
                     case ADD_PASSENGER:
                         System.out.println("Add a passenger");
@@ -189,6 +160,12 @@ public class App {
                         {
                             System.out.println("either the record didn't exist or name / email was wrong. Try again.");
                         }
+                        break;
+                    case EDIT_PASSENGER:
+                        System.out.println("Please enter ID of Passenger you'd like to edit");
+                        String pID = keyboard.nextLine();
+                        passengerStore.editPassenger(pID);
+                        break;
                     case EXIT:
                         System.out.println("Exit Menu option chosen");
                         break;
@@ -213,7 +190,7 @@ public class App {
                 + "4. Filter Vehicles by type \n"
                 + "5. Filter Cars by number of seats \n"
                 + "6. Exit \n"
-                + "Enter Option [1,5]";
+                + "Enter Option [1,6]";
 
         final int SHOW_ALL = 1;
         final int FIND_BY_REG = 2;
@@ -232,8 +209,7 @@ public class App {
                 switch (option) {
                     case SHOW_ALL:
                         System.out.println("Display ALL Vehicles");
-                        //vehicleManager.displayAllVehicles();
-                        //display(vehicleManager.getVehicleList());
+
                         ArrayList<Vehicle> vList = vehicleManager.getVehicleList();
 
                         for(Vehicle veh: vList)
@@ -267,20 +243,67 @@ public class App {
                         System.out.println("Enter registration number: ");
                         String reg = keyboard.nextLine();
                         Vehicle v = vehicleManager.findSingleVehicleByReg(reg);
-                        if (v == null)
+                        if (v == null) {
                             System.out.println("No vehicle matching the registration \"" + reg + "\"");
-                        else
-                            System.out.println("Found vehicle: \n" + v.toString());
+                        }
+                        else {
+                            System.out.println("Found vehicle: \n");
+
+                            System.out.println("----------------------------------------------------------------------------------------------------");
+                            System.out.println("\t\tVehicle ID : \t\t\t\t" + v.getId());
+                            System.out.println("\t\tVehicle Type : \t\t\t\t" + v.getType());
+                            System.out.println("\t\tVehicle Make : \t\t\t\t" + v.getMake());
+                            System.out.println("\t\tVehicle Model : \t\t\t" + v.getModel());
+                            System.out.println("\t\tVehicle registration : \t\t" + v.getRegistration());
+                            System.out.println("\t\tVehicle cost per mile : \t€" + v.getCostPerMile());
+                            System.out.println("\t\tLast service date : \t\t" + v.getLastServicedDate());
+                            System.out.println("\t\tVehicle Mileage : \t\t\t" + v.getMileage());
+                            System.out.println("\t\tVehicle Location : \t\t\t" + v.getDepotGPSLocation());
+
+                            if(v instanceof Car)
+                            {
+
+                                 System.out.println("\t\tNumber of seats : \t\t\t" + ((Car)v).getNumSeats());
+                                 System.out.println("----------------------------------------------------------------------------------------------------");
+                            }
+                            else
+                            {
+                                System.out.println("\t\tLoad Space : \t\t\t\t" + ((Van)v).getLoadSpace());
+                                System.out.println("----------------------------------------------------------------------------------------------------");
+                            }
+                        }
                         break;
                     case SORT_BY_REG:
                         System.out.println("All vehicles sorted by registration:");
                         VehicleRegistrationComparator vRComparator = new VehicleRegistrationComparator();
                         Collections.sort( vehicles, vRComparator );
-                        display(vehicles);
+
+                        for(Vehicle veh: vehicles)                                                                                                                        
+                        {
+                        System.out.println("----------------------------------------------------------------------------------------------------");
+                        System.out.println("\t\tVehicle ID : \t\t\t\t" + veh.getId());
+                        System.out.println("\t\tVehicle Type : \t\t\t\t" + veh.getType());
+                        System.out.println("\t\tVehicle Make : \t\t\t\t" + veh.getMake());
+                        System.out.println("\t\tVehicle Model : \t\t\t" + veh.getModel());
+                        System.out.println("\t\tVehicle registration : \t\t" + veh.getRegistration());
+                        System.out.println("\t\tVehicle cost per mile : \t€" + veh.getCostPerMile());
+                        System.out.println("\t\tLast service date : \t\t" + veh.getLastServicedDate());
+                        System.out.println("\t\tVehicle Mileage : \t\t\t" + veh.getMileage());
+                        System.out.println("\t\tVehicle Location : \t\t\t" + veh.getDepotGPSLocation());
+
+                        if(veh instanceof Car)
+                        {
+
+                             System.out.println("\t\tNumber of seats : \t\t\t" + ((Car)veh).getNumSeats());
+                             System.out.println("----------------------------------------------------------------------------------------------------");
+                        }
+                        else
+                        {
+                            System.out.println("\t\tLoad Space : \t\t\t\t" + ((Van)veh).getLoadSpace());
+                            System.out.println("----------------------------------------------------------------------------------------------------");
+                        }
+                        }
                         break;
-
-
-
                     case FILTER_BY_VEHI_TYPE:
                            System.out.println("Input the type of vehicle you'd like to filter by: (Car / 4x4 / Truck / Van)");
                            String typeFilter = keyboard.nextLine();
@@ -301,7 +324,6 @@ public class App {
 
                                    if(typeFilter.equalsIgnoreCase("car") || typeFilter.equalsIgnoreCase("4x4") )
                                    {
-
                                         System.out.println("\t\tNumber of seats : \t\t\t" + ((Car)veh).getNumSeats());
                                         System.out.println("----------------------------------------------------------------------------------------------------");
                                    }
@@ -310,10 +332,7 @@ public class App {
                                        System.out.println("\t\tLoad Space : \t\t\t\t" + ((Van)veh).getLoadSpace());
                                        System.out.println("----------------------------------------------------------------------------------------------------");
                                    }
-
                                }
-
-
                            }
                         break;
                     case FILTER_BY_NUM_SEATS:
@@ -347,14 +366,11 @@ public class App {
                         System.out.print("Invalid option - please enter number in range");
                         break;
                 }
-
             } catch (InputMismatchException | NumberFormatException e) {
                 System.out.print("Invalid option - please enter number in range");
             }
         } while (option != EXIT);
-
     }
-
     private void displayBookingMenu() {
         final String MENU_ITEMS = "\n*** BOOKING MENU ***\n"
                 + "1. Show all Bookings\n"
@@ -370,7 +386,7 @@ public class App {
                 + "11. Get average length of booking journeys \n"
                 + "12. View mailing list \n"
                 + "13. Exit \n"
-                + "Enter Option [1,11]";
+                + "Enter Option [1,13]";
 
         final int SHOW_ALL = 1;
         final int ADD_A_BOOKING = 2;
@@ -395,15 +411,11 @@ public class App {
                 option = Integer.parseInt(usersInput);
                 switch (option) {
                     case SHOW_ALL:
-
-                        //System.out.println("Display ALL Bookings");
-                        //bookingManager.displayAllBookings();
                         bookingManager.DisplayBookings();
                         break;
                     case ADD_A_BOOKING:
 
                         System.out.println("Add a booking");
-
                         System.out.println("Please enter your name");
                         String nameForBooking = keyboard.nextLine();
 
@@ -412,16 +424,12 @@ public class App {
                             System.out.println("We did not find you in our records, please create a profile!");
                             passengerStore.addPassenger();
                             checkPass = passengerStore.findPassengerByName(nameForBooking);
-
                         }
                         else{
                             System.out.println("you're already in our system, excellent!");
                         }
-
-
                             Vehicle checkVeh = null;
                             String vehId = "";
-
 
                         if (checkVeh == null) {
                             while(checkVeh == null) {
@@ -430,29 +438,37 @@ public class App {
                                 checkVeh = vehicleManager.findSingleVehicleByReg(regForBooking);
                             }
 
-                        } /*else {
-                            System.out.println("you're already in our system, excellent!");
-                            vehId = vehicle.getId(checkVeh);
-                            // write method to return vehicle id here
-                        }*/
+                        }
 
                         int bookingId = bookingManager.assignBookingId();
 
-                        double endLat = 0.0;
-                        double endLong = 0.0;
+                        double endLat = -100.0;
+                        double endLong = -200.0;
 
-
-                        while(endLat == 0.0)
+                        while(endLat == -100.0)
                         {
                             System.out.println("Please enter the end latitude.");
-                            endLat = keyboard.nextDouble();
+                            try {
+                                endLat = keyboard.nextDouble();
+                            }
+                            catch (InputMismatchException e)
+                            {
+                                System.out.println("Please enter a value between -90 and 90");
+                                keyboard.next();
+                            }
                         }
-                        while(endLong == 0.0)
+                        while(endLong == -200.0)
                         {
                             System.out.println("Please enter the end longitude.");
-                            endLong = keyboard.nextDouble();
+                            try {
+                                endLong = keyboard.nextDouble();
+                            }
+                            catch (InputMismatchException e)
+                            {
+                                System.out.println("Please enter a value between -180 and 180");
+                                keyboard.next();
+                            }
                         }
-
 
                         LocationGPS endLocation = new LocationGPS(endLat, endLong);
 
@@ -475,15 +491,23 @@ public class App {
                         String BookId = keyboard.nextLine();
                         keyboard.nextLine();
                         Booking b = bookingManager.findBookingById(BookId);
-                        if (b == null)
+                        if (b == null) {
                             System.out.println("No booking matching the ID");
-                        else
-                            System.out.println("Found booking: \n" + b.toString());
+                        }
+                        else {
+                            System.out.println("Found booking: \n");
+                            System.out.println("--------------------------------------------------------------------------------------------------------------");
+                            System.out.println("\t\tBooking ID : \t\t\t\t\t" + b.getBookingId());
+                            System.out.println("\t\tPassenger ID : \t\t\t\t\t" + b.getPassengerId());
+                            System.out.println("\t\tVehicle ID : \t\t\t\t\t" + b.getVehicleId());
+                            System.out.println("\t\tBooking Date & Time : \t\t\t" + b.getBookingDateTime());
+                            System.out.println("\t\tStarting Co-ordinates : \t\t" + b.getStartLocation());
+                            System.out.println("\t\tDestination Co-ordinates : \t\t" + b.getEndLocation());
+                            System.out.println("\n\t\tTotal Cost : \t\t\t\t\t€" + b.getCost());
+                            System.out.println("--------------------------------------------------------------------------------------------------------------");
+                        }
                         break;
                     case SHOW_BY_PID:
-                        //System.out.println("Please enter Passenger ID to view all related bookings");
-                        //String passengerID = keyboard.nextLine();
-                        //bookingManager.DisplayBookingsByPassengerId(passengerID);
 
                         ArrayList<Booking> listByPassID = new ArrayList<>();
                         System.out.println("List of bookings by passenger ID");
@@ -511,7 +535,6 @@ public class App {
                                 System.out.println("--------------------------------------------------------------------------------------------------------------");
                             }
                         }
-
                         break;
                     case SHOW_BY_BID:
                         System.out.println("Please enter Booking ID to view all related bookings");
@@ -547,22 +570,6 @@ public class App {
                                 System.out.println("--------------------------------------------------------------------------------------------------------------");
                             }
                         }
-                                   System.out.println("Filter by Year...");
-                                   List<Booking> bList = bookingManager.filterBy(new BookingYearFilter("2021"));
-                                   System.out.println(bList);
-
-                        
-                               for (Booking bkng : bList) {
-                                   System.out.println("--------------------------------------------------------------------------------------------------------------");
-                                   System.out.println("\t\tBooking ID : \t\t\t\t\t" + bkng.getBookingId());
-                                   System.out.println("\t\tPassenger ID : \t\t\t\t\t" + bkng.getPassengerId());
-                                   System.out.println("\t\tVehicle ID : \t\t\t\t\t" + bkng.getVehicleId());
-                                   System.out.println("\t\tBooking Date & Time : \t\t\t" + bkng.getBookingDateTime());
-                                   System.out.println("\t\tStarting Co-ordinates : \t\t" + bkng.getStartLocation());
-                                   System.out.println("\t\tDestination Co-ordinates : \t\t" + bkng.getEndLocation());
-                                   System.out.println("\n\t\tTotal Cost : \t\t\t\t\t€" + bkng.getCost());
-                                   System.out.println("--------------------------------------------------------------------------------------------------------------");
-                               }
                         break;
                     case DEL_BY_ID:
                         System.out.println("Please enter ID of booking you'd like to delete");
@@ -572,7 +579,16 @@ public class App {
                     case EDIT_BOOKING:
                         System.out.println("Please enter ID of booking you'd like to edit");
                         String bid = keyboard.nextLine();
-                        bookingManager.editBooking(bid);
+
+                        Booking validateBooking = bookingManager.findBookingById(bid);
+                        
+                        if(validateBooking != null) {
+                            bookingManager.editBooking(bid);
+                        }
+                        else
+                        {
+                            System.out.println("No such booking  by ID: " + bid + " exists, try again.");
+                        }
                         break;
                     case SHOW_CURRENT:
                          ArrayList<Booking> listCurrent = new ArrayList<>();
@@ -625,9 +641,8 @@ public class App {
                         System.out.println("\n\nThis is the average length of booking journeys : " + avgRounded);
                         break;
                     case VIEW_MAIL_LIST:
-                        System.out.println("Here's the current mailing list: ");
+                        System.out.println("Here's the current mailing list: (only new bookings generate emails)");
                         ArrayList<Email> mailingList = emailManager.getMailingList();
-
                         if(mailingList != null) {
                             for (Email ml : mailingList) {
                                 String res = ml.toString();
@@ -642,7 +657,6 @@ public class App {
                         System.out.print("Invalid option - please enter number in range");
                         break;
                 }
-
             } catch (InputMismatchException | NumberFormatException e) {
                 System.out.print("Invalid option - please enter number in range");
             }
